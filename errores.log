@@ -1,0 +1,3 @@
+2025-08-07 22:51:05,269 - ERROR - Error al procesar transacción abc125: 'TransaccionNotificada' object has no attribute 'CVU'
+2025-08-07 22:53:26,542 - ERROR - Error al procesar transacción abc125: 'TransaccionNotificada' object has no attribute 'CVU'
+2025-08-07 22:53:32,352 - ERROR - Error al procesar transacción abc125: 'TransaccionNotificada' object has no attribute 'CVU'

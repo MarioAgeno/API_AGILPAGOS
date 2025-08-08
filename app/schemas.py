@@ -23,7 +23,7 @@ class TransaccionNotificada(BaseModel):
     fechaOperacion: str
     fechaContable: str
     observaciones: Optional[str]
-    CVU: str
+    cvu: str = Field(..., alias="CVU")
     idTransaccionOriginante: Optional[str]
     idTransaccionEntidad: str
     idEntidad: str
@@ -33,3 +33,7 @@ class TransaccionNotificada(BaseModel):
     idCoelsa: Optional[str]
     transaccionCuentaContraparte: Contraparte
     impuestos: List[Impuesto]
+
+    class Config:
+        validate_by_name = True  # <- Pydantic v2 usa este nombre
+        extra = "forbid"         # (opcional) rechaza campos inesperados

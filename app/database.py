@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
+
 # Cargar variables del .env
 load_dotenv()
 
@@ -11,6 +12,8 @@ database = os.getenv("DB_NAME")
 username = os.getenv("DB_USER")
 password = os.getenv("DB_PASSWORD")
 driver = os.getenv("DB_DRIVER")
+AUTH_TOKEN = os.getenv("AUTH_TOKEN")
+
 
 # Formato para cadena de conexión
 connection_string = (
