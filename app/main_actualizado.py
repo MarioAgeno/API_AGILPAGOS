@@ -1,22 +1,22 @@
-from fastapi import FastAPI, Depends, Security
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.schemas import TransaccionNotificada
-from app.database import SessionLocal, AUTH_TOKEN
+from app.database import SessionLocal
 from app.models import Transaccion
 from datetime import datetime
-import logging
+import logging, json
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Security
+from fastapi.responses import HTMLResponse
+from app.database import AUTH_TOKEN
 from logging.handlers import RotatingFileHandler
 
 app = FastAPI()
 security = HTTPBearer()
 
-# Configuración del logging para registrar errores 
+# Logging rotativo para evitar crecimiento indefinido
 handler = RotatingFileHandler(
-    "errores.log",
-    maxBytes=1_000_000,  # 1 MB
-    backupCount=5        # hasta 5 archivos .log antiguos
+    "errores.log", maxBytes=1_000_000, backupCount=5
 )
 logging.basicConfig(
     handlers=[handler],
@@ -24,8 +24,7 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-
-# Dependencia para obtener la sesión de la base de datos
+# DB Session
 def get_db():
     db = SessionLocal()
     try:
@@ -33,7 +32,6 @@ def get_db():
     finally:
         db.close()
 
-# Endpoint para recibir transacciones notificadas
 @app.post("/transacciones")
 def recibir_transaccion(
     data: TransaccionNotificada,
@@ -42,15 +40,12 @@ def recibir_transaccion(
 ):
     token = credentials.credentials
     if token != AUTH_TOKEN:
-        return {"status": "error", "mensaje": "Token inválido"}
-
+        raise HTTPException(status_code=401, detail="Token inválido")
     try:
-        # Validar duplicado
         transaccion_existente = db.query(Transaccion).filter_by(id_transaccion=data.idTransaccion).first()
         if transaccion_existente:
-            return {"status": "duplicado", "mensaje": "La transacción ya existe"}
+            return {"status": "duplicado"}
 
-        # Registrar nueva transacción
         nueva = Transaccion(
             id_transaccion=data.idTransaccion,
             tipo=data.idTipoTransaccion,
@@ -58,29 +53,25 @@ def recibir_transaccion(
             importe=data.importe,
             fecha_operacion=datetime.fromisoformat(data.fechaOperacion),
             cvu=data.cvu,
-            observaciones=data.observaciones
+            observaciones=data.observaciones,
+            payload_raw=json.dumps(data.dict(by_alias=True))
         )
 
         db.add(nueva)
         db.commit()
 
-        return {"status": "ok", "mensaje": "Transacción registrada correctamente"}
-
+        return {"status": "ok"}
     except Exception as e:
         logging.error(f"Error al procesar transacción {data.idTransaccion}: {str(e)}")
-        return {"status": "error_interno", "mensaje": "Error inesperado al procesar la transacción"}
+        raise HTTPException(status_code=500, detail="Error interno")
 
+@app.get("/", response_class=HTMLResponse, tags=["Inicio"])
+async def mensaje():
+    return '''
+        <h1><a href='http://www.maasoft.com.ar'>MAASoft WEB</a></h1>
+        <a href='/docs'>Documentación Swagger</a>
+    '''
 
-
-# Endpoint para verificar el estado del servicio
 @app.get("/status")
 def status():
     return {"status": "ok"}
-
-
-@app.get('/', response_class=HTMLResponse, tags=['Inicio'])
-async def mensage():
-    return '''
-        <h1><a href='http://www.maasoft.com.ar'>MAASoft WEB</a></h1>
-        <a href='http://186.189.231.237:6868/docs'>Documentacion</a>
-    '''
