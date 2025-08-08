@@ -37,16 +37,14 @@ def recibir_transaccion(
     db: Session = Depends(get_db)
 ):
     token = credentials.credentials
-
-
     if token != AUTH_TOKEN:
-        raise HTTPException(status_code=401, detail="Token inválido")
+        return {"status": "error", "mensaje": "Token inválido"}
+
     try:
         # Validar duplicado
         transaccion_existente = db.query(Transaccion).filter_by(id_transaccion=data.idTransaccion).first()
         if transaccion_existente:
-            return { "status": "duplicado", "mensaje": "La transacción ya fue recibida anteriormente" }
-
+            return {"status": "duplicado", "mensaje": "La transacción ya existe"}
 
         # Registrar nueva transacción
         nueva = Transaccion(
@@ -62,11 +60,12 @@ def recibir_transaccion(
         db.add(nueva)
         db.commit()
 
-        return {"status": "ok"}
+        return {"status": "ok", "mensaje": "Transacción registrada correctamente"}
 
     except Exception as e:
         logging.error(f"Error al procesar transacción {data.idTransaccion}: {str(e)}")
-        raise HTTPException(status_code=500, detail="Error interno")
+        return {"status": "error_interno", "mensaje": "Error inesperado al procesar la transacción"}
+
 
 
 # Endpoint para verificar el estado del servicio

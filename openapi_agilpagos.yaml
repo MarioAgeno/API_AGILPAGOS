@@ -1,0 +1,113 @@
+openapi: 3.0.1
+info:
+  title: Webhook de Recepción de Transacciones - AGILPAGOS
+  version: "1.0"
+  description: >
+    Este servicio expone un endpoint que permite a AGILPAGOS notificar transacciones
+    hacia la entidad financiera/mutual. Toda transacción válida recibida será confirmada
+    con HTTP 200, y cada estado será devuelto en formato JSON con un campo `status`.
+servers:
+  - url: https://api.entidadmutual.com.ar
+
+paths:
+  /transacciones:
+    post:
+      summary: Notificar una transacción
+      description: Recibe una transacción desde AGILPAGOS vía webhook seguro.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransaccionNotificada'
+      responses:
+        '200':
+          description: Respuesta exitosa con estado de la transacción
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  mensaje:
+                    type: string
+                    example: Transacción registrada correctamente
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    TransaccionNotificada:
+      type: object
+      properties:
+        idTransaccion:
+          type: string
+        idTransaccionAnulada:
+          type: string
+          nullable: true
+        idTipoTransaccion:
+          type: integer
+        numeroCuenta:
+          type: string
+        importe:
+          type: number
+        idMoneda:
+          type: integer
+        fechaOperacion:
+          type: string
+          format: date-time
+        fechaContable:
+          type: string
+          format: date-time
+        observaciones:
+          type: string
+          nullable: true
+        CVU:
+          type: string
+        idTransaccionOriginante:
+          type: string
+          nullable: true
+        idTransaccionEntidad:
+          type: string
+        idEntidad:
+          type: string
+        idWebOperacion:
+          type: string
+        cuentaBloqueada:
+          type: boolean
+          nullable: true
+        total:
+          type: number
+        idCoelsa:
+          type: string
+          nullable: true
+        transaccionCuentaContraparte:
+          type: object
+          properties:
+            cuentaContraparte:
+              type: string
+            cuitContraparte:
+              type: integer
+            titularContraparte:
+              type: string
+        impuestos:
+          type: array
+          items:
+            type: object
+            properties:
+              idTransaccion:
+                type: string
+              importe:
+                type: number
+              idTipoTransaccion:
+                type: integer
+              tipoImporte:
+                type: string
+              idTipoImporte:
+                type: string

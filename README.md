@@ -18,12 +18,12 @@ El sistema expone un endpoint `POST /transacciones` que recibe notificaciones en
 
 api_creditos_agilpagos/
 ├── app/
-│ ├── main.py # Punto de entrada de la API
-│ ├── schemas.py # Esquemas de validación (Pydantic)
-│ ├── models.py # Modelo de datos SQLAlchemy
-│ ├── database.py # Configuración de conexión a SQL Server
-├── .env # Variables de entorno (no versionado)
-├── requirements.txt # Dependencias del proyecto
+│   ├── main.py              # Punto de entrada de la API
+│   ├── schemas.py           # Esquemas de validación (Pydantic)
+│   ├── models.py            # Modelo de datos SQLAlchemy
+│   ├── database.py          # Configuración de conexión a SQL Server
+├── .env                     # Variables de entorno (no versionado)
+├── requirements.txt         # Dependencias del proyecto
 └── README.md
 
 
@@ -47,13 +47,22 @@ Este microservicio está pensado para ser expuesto por una URL pública y debe p
 {
   "status": "ok"
 }
+```
 
+## 🧪 Testing
 
-🧪 Testing
-Levantar con: uvicorn app.main:app --reload
+Levantar con:
+```
+uvicorn app.main:app --reload
+```
 
-Probar con Swagger en: http://localhost:8000/docs
+Probar con Swagger en: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-🧑‍💻 Desarrollado por
-MAASoft — Soluciones Financieras para Entidades Mutualistas
+## 📄 Documentación técnica OpenAPI
 
+Podés encontrar el archivo OpenAPI con el esquema completo del servicio en:
+[openapi_agilpagos.yaml](./openapi_agilpagos.yaml)
+
+## 🧑‍💻 Desarrollado por
+
+**MAASoft** — Soluciones Financieras para Entidades Mutualistas
