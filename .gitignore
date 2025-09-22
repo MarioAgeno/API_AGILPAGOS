@@ -3,4 +3,5 @@ venv
 .env
 .gitignore
 app/__pycache__
+.zip 
 
