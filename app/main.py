@@ -5,12 +5,14 @@ from sqlalchemy.orm import Session
 from app.schemas import TransaccionNotificada
 from app.database import SessionLocal, AUTH_TOKEN
 from app.models import Transaccion
+from app.sg import router as sg_router
 from datetime import datetime
 import logging
 from logging.handlers import RotatingFileHandler
 
 app = FastAPI()
 security = HTTPBearer()
+app.include_router(sg_router, prefix="/sg", tags=["SG"])
 
 # Configuración del logging para registrar errores 
 handler = RotatingFileHandler(
